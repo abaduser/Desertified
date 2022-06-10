@@ -1,0 +1,94 @@
+{
+  "main": {
+    "id": "95faf4699e4d1b3c",
+    "type": "split",
+    "children": [
+      {
+        "id": "b73e5b52f16b793b",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Map Notes.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c882673535fe6e97",
+    "type": "split",
+    "children": [
+      {
+        "id": "f748979f09e627dd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c869031d9a91b365",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "6c1da5f2167f7404",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "8acf817bc18f5bcb",
+    "type": "split",
+    "children": [
+      {
+        "id": "b8fa153da964c004",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2ab452513d3b046f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Map Notes.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "b73e5b52f16b793b",
+  "lastOpenFiles": [
+    "Map Notes.md",
+    "Desertified Concept Paper.md"
+  ]
+}
