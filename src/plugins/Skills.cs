@@ -39,11 +39,11 @@ namespace Oxide.Plugins
             playerDataFile.Save();
         }
 
-        [Command("checkstats")]
-        private void CheckStats(IPlayer player, string command, string[] args)
+        [Libraries.Commands.Command("checkstats")]
+        private void CheckStats(Libraries.Covalence.IPlayer player, string command, string[] args)
         {
-            string playerId = player.Id;
-            player.Reply(playerDataFile[playerId, "Skills"]);
+            string playerId = Libraries.Covalence.IPlayer.Id;
+            Libraries.Covalence.IPlayer.Reply(playerDataFile[playerId, "Skills", "Strength"]);
         }
     }
 //    private class PluginConfig
