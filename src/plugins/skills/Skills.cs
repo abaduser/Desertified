@@ -1,3 +1,7 @@
+using Oxide.Core;
+using Oxide.Core.Configuration;
+using Oxide.Core.Plugins;
+
 namespace Oxide.Plugins
 {
     [Info("Skills", "jukebox, yx", "0.0.1")]
@@ -5,21 +9,19 @@ namespace Oxide.Plugins
     public class Skills : RustPlugin
     {
         // jukebox: Either creates or loads an existing playerdata file.
-        public DynamicConfigFile playerDataFile = Interface.Oxide.DataFileSystem.GetDatafile("desertified_playerdata.json");
-        private struct SkillData {
-            double Strength;
-        }
+        public DynamicConfigFile playerDataFile;
 
         void Init()
         {
             try
             {
-                Puts("Hello world!");
+                Puts("Initializing...");
+                playerDataFile = Interface.Oxide.DataFileSystem.GetDatafile("desertified_playerdata");
                 Subscribe("OnPlayerConnected");
             }
             catch
             {
-                LogWarning("We failed to initialize!");
+                Puts("We failed to intialize!");
                 Unsubscribe("OnPlayerConnected");
             }
             return;
@@ -29,13 +31,19 @@ namespace Oxide.Plugins
         {
             string playerId = player.IPlayer.Id;
             // jukebox: Check if the player already has data - if not, we get them some.    
-            if (playerDataFile[playerId] == null || playerDataFile[playerId, "Skills"] == null)
+            if (playerDataFile[playerId] == null)
             {
-                playerDataFile[playerId, "Skills"] = SkillData(Strength = 0.0);
+               playerDataFile[playerId, "Skills", "Strength"] = 0.0; 
             }
-            SkillData playerSkills = playerDataFile[playerId, "Skills"];
-            Puts("!!!!!!!!!!!!!!!!! PLAYER STRENGTH:" + playerSkills.Strength);
+            Puts("!!!!!!!!!!!!!!!!! PLAYER STRENGTH:" + playerDataFile[playerId, "Skills", "Strength"]);
             playerDataFile.Save();
+        }
+
+        [Command("checkstats")]
+        private void CheckStats(IPlayer player, string command, string[] args)
+        {
+            string playerId = player.Id;
+            player.Reply(playerDataFile[playerId, "Skills"]);
         }
     }
 //    private class PluginConfig
