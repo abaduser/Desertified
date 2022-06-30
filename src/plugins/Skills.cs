@@ -2,6 +2,7 @@ using Oxide.Core;
 using Oxide.Core.Configuration;
 using Oxide.Core.Plugins;
 using System.Collections.Generic;
+using Oxide.Core.Libraries.Covalence;
 
 namespace Oxide.Plugins
 {
@@ -19,13 +20,35 @@ namespace Oxide.Plugins
                 Puts("Initializing...");
                 playerDataFile = Interface.Oxide.DataFileSystem.GetDatafile("desertified_playerdata");
                 Subscribe("OnPlayerConnected");
+                Subscribe("OnWeaponFired");
+                Subscribe("OnMeleeAttack");
+                Subscribe("OnMeleeThrown");
+                Subscribe("OnEntityKill");
             }
             catch
             {
                 Puts("We failed to intialize!");
                 Unsubscribe("OnPlayerConnected");
+                Unsubscribe("OnWeaponFired");
+                Unsubscribe("OnMeleeAttack");
+                Unsubscribe("OnMeleeThrown");
+                Unsubscribe("OnEntityKill");
             }
             return;
+        }
+
+        void OnWeaponFired(BaseProjectile projectile, BasePlayer player, ItemModProjectile projectileMod, ProtoBuf.ProjectileShoot pBuffer)
+        {
+            Puts(player.IPlayer.Name + " You Fired ");
+        }
+
+        void OnMeleeAttack(BasePlayer player, HitInfo info)
+        {
+            Puts(player.IPlayer.Name + " melee attacked " + info.HitEntity + " using " + info.Weapon);
+            info.gatherScale = info.gatherScale*2;
+            Puts("Gather Scale: " + info.gatherScale);
+            Puts("Did Gather?: " + info.DidGather);
+            Puts("Can Gather?: " + info.CanGather);
         }
 
         void OnPlayerConnected(BasePlayer player)
@@ -51,7 +74,7 @@ namespace Oxide.Plugins
             }
         }
 
-        
+
     }
 //    private class PluginConfig
 //    {
