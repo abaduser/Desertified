@@ -33,17 +33,20 @@ namespace Oxide.Plugins
             // jukebox: Check if the player already has data - if not, we get them some.    
             if (playerDataFile[playerId] == null)
             {
-               playerDataFile[playerId, "Skills", "Strength"] = 0.0; 
+               playerDataFile[playerId, "Skills", "Strength"] = 0.0;
             }
             Puts("!!!!!!!!!!!!!!!!! PLAYER STRENGTH:" + playerDataFile[playerId, "Skills", "Strength"]);
             playerDataFile.Save();
         }
 
-        [Libraries.Commands.Command("checkstats")]
-        private void CheckStats(Libraries.Covalence.IPlayer player, string command, string[] args)
+        [ChatCommand("checkstats")]
+        private void CheckStats(BasePlayer player, string command, string[] args)
         {
-            string playerId = Libraries.Covalence.IPlayer.Id;
-            Libraries.Covalence.IPlayer.Reply(playerDataFile[playerId, "Skills", "Strength"]);
+            string playerId = player.IPlayer.Id;
+            foreach (string skill in playerDataFile[playerId, "Skills"].KeyCollection.Keys)
+            {
+                SendReply(player, "Your " + skill + " is " + playerDataFile[playerId, "Skills", skill]);
+            }
         }
     }
 //    private class PluginConfig
