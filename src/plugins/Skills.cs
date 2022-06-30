@@ -1,6 +1,7 @@
 using Oxide.Core;
 using Oxide.Core.Configuration;
 using Oxide.Core.Plugins;
+using System.Collections.Generic;
 
 namespace Oxide.Plugins
 {
@@ -43,11 +44,14 @@ namespace Oxide.Plugins
         private void CheckStats(BasePlayer player, string command, string[] args)
         {
             string playerId = player.IPlayer.Id;
-            foreach (string skill in playerDataFile[playerId, "Skills"].KeyCollection.Keys)
+            // jukebox: Creating a key collection so we can iterate over all the skills
+            foreach( KeyValuePair<string, object> kvp in (Dictionary<string, object>)playerDataFile[playerId, "Skills"])
             {
-                SendReply(player, "Your " + skill + " is " + playerDataFile[playerId, "Skills", skill]);
+                SendReply(player, "Your " + kvp.Key + " is " + kvp.Value);
             }
         }
+
+        
     }
 //    private class PluginConfig
 //    {
