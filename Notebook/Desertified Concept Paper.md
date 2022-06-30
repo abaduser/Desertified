@@ -18,10 +18,4 @@ Strength will increase:
 -  Ability to Melee raid (Past Level 2)
 melee raiding impossible if you have low strength (debuffs from vanilla over just purely buffing as an example.
 
-Consitution Will Increase:
-- Resistance to Bleed
-- Resistance to Starvation
-- Resistance to Heat and Cold
-- Resistance to Hunger and Thirst
-- Max HP
 
