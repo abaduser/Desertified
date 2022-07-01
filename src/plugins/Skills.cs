@@ -41,6 +41,8 @@ namespace Oxide.Plugins
             foreach (ProtoBuf.ProjectileShoot.Projectile proj in projectiles.projectiles)
             {
                 proj.startVel = proj.startVel * 0.05f;
+                // jukebox: Trying DESPERATELY to sync the server's understanding of a projectile to the client.
+                // Note that this could be completely impossible and despair.
                 foreach (KeyValuePair<int, BasePlayer.FiredProjectile> kvp in player.firedProjectiles)
                 {
                     player.firedProjectiles[kvp.Key].initialVelocity = proj.startVel;
@@ -68,17 +70,31 @@ namespace Oxide.Plugins
         void OnPlayerConnected(BasePlayer player)
         {
             string playerId = player.IPlayer.Id;
+            string playerName = player.IPlayer.Name;
+
             // jukebox: Check if the player already has data - if not, we get them some.    
             if (playerDataFile[playerId] == null)
             {
-               // jukebox: Players start with 0.50 (50%) in their strength stat
-               playerDataFile[playerId, "Skills", "Strength"] = 0.50;
+               Puts("Creating fresh skills for " + playerName)
+               // jukebox: Each skill has a double that acts as a percentage of a normal
+               // rust character's ability.
+               playerDataFile[playerId, "skills", "muscles"] = 0.50;
+               playerDataFile[playerId, "skills", "guts"] = 0.50;
+               playerDataFile[playerId, "skills", "tendons"] = 0.50;
+               // jukebox: Spine is acting as an overall boost, so it should be lower.
+               playerDataFile[playerId, "skills", "spine"] = 0.25;
             }
-            Puts("!!!!!!!!!!!!!!!!! PLAYER STRENGTH:" + playerDataFile[playerId, "Skills", "Strength"]);
+
+            Puts("Retrieved " + playerName + "'s skills:");
+            Puts("\tMUSCLES: " + playerDataFile[playerId, "skills", "muscles"]);
+            Puts("\tGUTS: " + playerDataFile[playerId, "skills", "guts"]);
+            Puts("\tTENDONS: " + playerDataFile[playerId, "skills", "tendons"]);
+            Puts("\tSPINE: " + playerDataFile[playerId, "skills", "spine"]);
             playerDataFile.Save();
         }
 
-        [ChatCommand("checkstats")]
+        // Convenience command for checking skills in game.
+        [ChatCommand("skills")]
         private void CheckStats(BasePlayer player, string command, string[] args)
         {
             string playerId = player.IPlayer.Id;
@@ -89,18 +105,29 @@ namespace Oxide.Plugins
             }
         }
 
-        [ChatCommand("setstat")]
+        // Convenience command for setting skills in game.
+        [ChatCommand("setskill")]
         private void SetStats(BasePlayer player, string command, string[] args)
         {
             string playerId = player.IPlayer.Id;
-            string stat = args[0];
-            if (stat == "strength" || stat == "str" || stat == "Strength")
+            string skill = args[0];
+            if (skill == "muscles" || skill == "m")
             {
-                playerDataFile[playerId, "Skills", "Strength"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "muscle"] = double.Parse(args[1]);
+            }
+            if (skill == "guts" || skill == "g")
+            {
+                playerDataFile[playerId, "skills", "guts"] = double.Parse(args[1]);
+            }
+            if (skill == "tendons" || skill == "t")
+            {
+                playerDataFile[playerId, "skills", "tendons"] = double.Parse(args[1]);
+            }
+            if (skill == "spine" || skill == "s")
+            {
+                playerDataFile[playerId, "skills", "spine"] = double.Parse(args[1]);
             }
         }
-
-
     }
 //    private class PluginConfig
 //    {
