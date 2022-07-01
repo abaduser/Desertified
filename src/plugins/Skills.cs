@@ -38,16 +38,19 @@ namespace Oxide.Plugins
         void OnWeaponFired(BaseProjectile projectile, BasePlayer player, ItemModProjectile mod, ProtoBuf.ProjectileShoot projectiles)
         {
             Puts("OnWeaponFired works!");
+
+            mod.projectileVelocity *= 0.1f;
+
+            // Changing the Projectile from the ProjectileShoot protobuffer to have less startVel
+            /*
             foreach (ProtoBuf.ProjectileShoot.Projectile proj in projectiles.projectiles)
             {
                 proj.startVel = proj.startVel * 0.05f;
                 // jukebox: Trying DESPERATELY to sync the server's understanding of a projectile to the client.
                 // Note that this could be completely impossible and despair.
-                foreach (KeyValuePair<int, BasePlayer.FiredProjectile> kvp in player.firedProjectiles)
-                {
-                    player.firedProjectiles[kvp.Key].initialVelocity = proj.startVel;
-                }
             }
+            */
+
         }
 
         void OnMeleeThrown(BasePlayer player, Item item)
@@ -55,16 +58,26 @@ namespace Oxide.Plugins
             // yx: item.info is the Item's ItemDefinition
             Puts("OnMeleeThrown works!");
             string playerId = player.IPlayer.Id;
-            float playerStrength = System.Convert.ToSingle(playerDataFile[playerId, "Skills", "Strength"]);
+            string playerName = player.IPlayer.Id;
+            float playerStrength = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
+
+            foreach (KeyValuePair<int, BasePlayer.FiredProjectile> kvp in player.firedProjectiles)
+            {
+                Puts(kvp.Value.itemDef.shortname);
+                // jukebox: grab FiredProjectile, boot it, and make our own
+                
+            }
         }
 
         void OnMeleeAttack(BasePlayer player, HitInfo info)
         {
-            Puts(player.IPlayer.Name + " melee attacked " + info.HitEntity + " using " + info.Weapon);
-            info.gatherScale = info.gatherScale*2;
-            Puts("Gather Scale: " + info.gatherScale);
-            Puts("Did Gather?: " + info.DidGather);
-            Puts("Can Gather?: " + info.CanGather);
+            string playerId = player.IPlayer.Id;
+            string playerName = player.IPlayer.Name;
+            
+            Puts(playerName + " melee attacked " + info.HitEntity + " using " + info.Weapon);
+            // jukebox: Adjusting the gather scale based on the muscles skill
+            float playerMuscles = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
+            info.gatherScale = info.gatherScale * playerMuscles;
         }
 
         void OnPlayerConnected(BasePlayer player)
@@ -75,14 +88,14 @@ namespace Oxide.Plugins
             // jukebox: Check if the player already has data - if not, we get them some.    
             if (playerDataFile[playerId] == null)
             {
-               Puts("Creating fresh skills for " + playerName)
-               // jukebox: Each skill has a double that acts as a percentage of a normal
-               // rust character's ability.
-               playerDataFile[playerId, "skills", "muscles"] = 0.50;
-               playerDataFile[playerId, "skills", "guts"] = 0.50;
-               playerDataFile[playerId, "skills", "tendons"] = 0.50;
-               // jukebox: Spine is acting as an overall boost, so it should be lower.
-               playerDataFile[playerId, "skills", "spine"] = 0.25;
+                Puts("Creating fresh skills for " + playerName);
+                // jukebox: Each skill has a double that acts as a percentage of a normal
+                // rust character's ability.
+                playerDataFile[playerId, "skills", "muscles"] = 0.50;
+                playerDataFile[playerId, "skills", "guts"] = 0.50;
+                playerDataFile[playerId, "skills", "tendons"] = 0.50;
+                // jukebox: Spine is acting as an overall boost, so it should be lower.
+                playerDataFile[playerId, "skills", "spine"] = 0.25;
             }
 
             Puts("Retrieved " + playerName + "'s skills:");
@@ -94,12 +107,12 @@ namespace Oxide.Plugins
         }
 
         // Convenience command for checking skills in game.
-        [ChatCommand("skills")]
+        [ChatCommand("checkskills")]
         private void CheckStats(BasePlayer player, string command, string[] args)
         {
             string playerId = player.IPlayer.Id;
             // jukebox: Creating a key collection so we can iterate over all the skills
-            foreach( KeyValuePair<string, object> kvp in (Dictionary<string, object>)playerDataFile[playerId, "Skills"])
+            foreach( KeyValuePair<string, object> kvp in (Dictionary<string, object>)playerDataFile[playerId, "skills"])
             {
                 SendReply(player, "Your " + kvp.Key + " is " + kvp.Value);
             }
@@ -113,7 +126,7 @@ namespace Oxide.Plugins
             string skill = args[0];
             if (skill == "muscles" || skill == "m")
             {
-                playerDataFile[playerId, "skills", "muscle"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "muscles"] = double.Parse(args[1]);
             }
             if (skill == "guts" || skill == "g")
             {
