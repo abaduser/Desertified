@@ -3,6 +3,7 @@ using Oxide.Core.Configuration;
 using Oxide.Core.Plugins;
 using System.Collections.Generic;
 using Oxide.Core.Libraries.Covalence;
+using System;
 
 namespace Oxide.Plugins
 {
@@ -21,6 +22,7 @@ namespace Oxide.Plugins
                 playerDataFile = Interface.Oxide.DataFileSystem.GetDatafile("desertified_playerdata");
                 Subscribe("OnPlayerConnected");
                 Subscribe("OnWeaponFired");
+                Subscribe("CanCreateWorldProjectile");
                 Subscribe("OnMeleeAttack");
                 Subscribe("OnMeleeThrown");
             }
@@ -29,55 +31,60 @@ namespace Oxide.Plugins
                 Puts("We failed to intialize!");
                 Unsubscribe("OnPlayerConnected");
                 Unsubscribe("OnWeaponFired");
+                Unsubscribe("CanCreateWorldProjectile");
                 Unsubscribe("OnMeleeAttack");
                 Unsubscribe("OnMeleeThrown");
             }
             return;
         }
 
+        void CanCreateWorldProjectile(HitInfo info,
+            ItemDefinition itemDef,
+            ItemModProjectile mod,
+            Projectile projectile,
+            Item item)
+        {
+            //Puts("Fuck");
+            //projectile.initialVelocity *= 0.1f;
+        }
+
         void OnWeaponFired(BaseProjectile projectile, BasePlayer player, ItemModProjectile mod, ProtoBuf.ProjectileShoot projectiles)
         {
             Puts("OnWeaponFired works!");
-
-            mod.projectileVelocity *= 0.1f;
-
-            // Changing the Projectile from the ProjectileShoot protobuffer to have less startVel
-            /*
-            foreach (ProtoBuf.ProjectileShoot.Projectile proj in projectiles.projectiles)
-            {
-                proj.startVel = proj.startVel * 0.05f;
-                // jukebox: Trying DESPERATELY to sync the server's understanding of a projectile to the client.
-                // Note that this could be completely impossible and despair.
-            }
-            */
-
+            mod.numProjectiles = 500;
         }
 
-        void OnMeleeThrown(BasePlayer player, Item item)
+        void OnMeleeThrown(ref BasePlayer player, Item item)
         {
             // yx: item.info is the Item's ItemDefinition
-            Puts("OnMeleeThrown works!");
             string playerId = player.IPlayer.Id;
             string playerName = player.IPlayer.Id;
-            float playerStrength = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
+            float playerMuscles = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
 
-            foreach (KeyValuePair<int, BasePlayer.FiredProjectile> kvp in player.firedProjectiles)
-            {
-                Puts(kvp.Value.itemDef.shortname);
-                // jukebox: grab FiredProjectile, boot it, and make our own
-                
-            }
+
         }
 
         void OnMeleeAttack(BasePlayer player, HitInfo info)
         {
             string playerId = player.IPlayer.Id;
             string playerName = player.IPlayer.Name;
-            
-            Puts(playerName + " melee attacked " + info.HitEntity + " using " + info.Weapon);
-            // jukebox: Adjusting the gather scale based on the muscles skill
             float playerMuscles = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
+
+            if (!info.DidHit) { return; }
+            //Puts(playerName + " melee attacked " + info.HitEntity + " using " + info.Weapon);
+            // jukebox: Adjusting the gather scale based on the muscles skill
             info.gatherScale = info.gatherScale * playerMuscles;
+            // yx: Adjust the Melee Hit Damage
+            DamageProperties.HitAreaProperty[] sandBones = new DamageProperties.HitAreaProperty[7];
+            for (int i=0;i<7;i++)
+            {
+                // yx: Create a new HitAreaProperty for each element, to replace default damage
+                DamageProperties.HitAreaProperty newBone = new DamageProperties.HitAreaProperty();
+                newBone.area = info.damageProperties.fallback.bones[i].area;
+                newBone.damage = info.damageProperties.fallback.bones[i].damage * (0.25f + playerMuscles);
+                sandBones[i] = newBone;
+            }
+            info.damageProperties.bones = sandBones;
         }
 
         void OnPlayerConnected(BasePlayer player)
@@ -91,11 +98,11 @@ namespace Oxide.Plugins
                 Puts("Creating fresh skills for " + playerName);
                 // jukebox: Each skill has a double that acts as a percentage of a normal
                 // rust character's ability.
-                playerDataFile[playerId, "skills", "muscles"] = 0.50;
-                playerDataFile[playerId, "skills", "guts"] = 0.50;
-                playerDataFile[playerId, "skills", "tendons"] = 0.50;
+                playerDataFile[playerId, "skills", "muscles"] = 0.50f;
+                playerDataFile[playerId, "skills", "guts"] = 0.50f;
+                playerDataFile[playerId, "skills", "tendons"] = 0.50f;
                 // jukebox: Spine is acting as an overall boost, so it should be lower.
-                playerDataFile[playerId, "skills", "spine"] = 0.25;
+                playerDataFile[playerId, "skills", "spine"] = 0.25f;
             }
 
             Puts("Retrieved " + playerName + "'s skills:");
@@ -126,22 +133,24 @@ namespace Oxide.Plugins
             string skill = args[0];
             if (skill == "muscles" || skill == "m")
             {
-                playerDataFile[playerId, "skills", "muscles"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "muscles"] = float.Parse(args[1]);
             }
             if (skill == "guts" || skill == "g")
             {
-                playerDataFile[playerId, "skills", "guts"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "guts"] = float.Parse(args[1]);
             }
             if (skill == "tendons" || skill == "t")
             {
-                playerDataFile[playerId, "skills", "tendons"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "tendons"] = float.Parse(args[1]);
             }
             if (skill == "spine" || skill == "s")
             {
-                playerDataFile[playerId, "skills", "spine"] = double.Parse(args[1]);
+                playerDataFile[playerId, "skills", "spine"] = float.Parse(args[1]);
             }
         }
     }
+
+
 //    private class PluginConfig
 //    {
 //    }
