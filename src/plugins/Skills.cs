@@ -61,7 +61,19 @@ namespace Oxide.Plugins
             string playerName = player.IPlayer.Id;
             float playerMuscles = System.Convert.ToSingle(playerDataFile[playerId, "skills", "muscles"]);
 
-
+            foreach (KeyValuePair<int, BasePlayer.FiredProjectile> proj in player.firedProjectiles)
+            {
+                if (proj.Value.weaponPrefab != null) { Puts("WE GOT THE POWER"); }
+                else { return; }
+                UnityEngine.GameObject rockInPotentia = GameManager.server.FindPrefab(proj.Value.weaponPrefab) ;
+                if (rockInPotentia != null)
+                {
+                    Puts("Rock achieved its full potential!");
+                    rockInPotentia.SetVelocity(UnityEngine.Vector3(0.0f, 0.0f, 0.0f));
+                }
+                Puts("\tWe didn't find the speedrock you were looking for :<");
+                return;
+            }
         }
 
         void OnMeleeAttack(BasePlayer player, HitInfo info)

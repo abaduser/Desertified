@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Skills.md",
+            "file": "Desertified Concept Paper.md",
             "mode": "source"
           }
         }
@@ -68,7 +68,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Skills.md",
+                "file": "Desertified Concept Paper.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -88,9 +88,9 @@
   },
   "active": "b73e5b52f16b793b",
   "lastOpenFiles": [
-    "Skills.md",
     "Desertified Concept Paper.md",
-    "Map Notes.md",
-    "raw ideas.md"
+    "raw ideas.md",
+    "Skills.md",
+    "Map Notes.md"
   ]
 }
